@@ -44,4 +44,4 @@ The AI is trained to classify and trigger music for:
 **Developed by Noam Maimon** *Passionate Software Developer and Cybersecurity Student.*
 
 ## ⚖️ Disclaimer
-I do not own any of the music or audio tracks used in this extension. All rights to the **One Piece** soundtracks and themes belong to their respective creators, composers, and original copyright holders (Toei Animation, Fuji TV, and Eiichiro Oda). This project is for educational and personal use only.
+I do not own any of the music or audio tracks used in this extension. All rights to the **One Piece** soundtracks and themes belong to their respective creators, composers, and original copyright holders (Toei Animation, Fuji TV, and Eiichiro Oda).
