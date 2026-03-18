@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="lib/tf.min.js"></script>
+    <script src="lib/teachablemachine-image.min.js"></script>
+</head>
+<body>
+    <script>
+        let model;
+        let trustedSource = null;
+
+        async function loadModel() {
+            try {
+                await tf.setBackend('cpu');
+                
+                const modelPath = 'model/model.json';
+                const metadataPath = 'model/metadata.json';
+                
+                model = await tmImage.load(modelPath, metadataPath);
+                console.log("AI Model loaded successfully in Sandbox");
+            } catch (e) {
+                console.error("Failed to load AI model:", e);
+            }
+        }
+
+        window.addEventListener('message', async (event) => {
+            //אבטחה, מוודה שהגיע מקונטנט
+            if (event.source !== window.parent) return;
+
+            if (!trustedSource) {
+                trustedSource = event.origin;
+            }
+
+            if (event.origin !== trustedSource) return;
+
+            const { action, imageData } = event.data;
+
+            if (action === 'PREDICT' && model) {
+                const img = new Image();
+                img.onload = async () => {
+                    const predictions = await model.predict(img); //סריקת התמונה על ידי האי איי
+                    
+                    const bestPrediction = predictions.reduce((prev, current) => 
+                        (prev.probability > current.probability) ? prev : current
+                    );
+
+                    window.parent.postMessage({ //החזקת תשובה לקונטנט
+                        action: 'PREDICT_RESULT',
+                        result: bestPrediction
+                    }, trustedSource);
+                };
+                img.src = imageData;
+            }
+        });
+
+        loadModel();
+    </script>
+</body>
+</html>

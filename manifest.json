@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "Manga Music AI",
+  "version": "3",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://weebcentral.com/*", "*://mangaplus.shueisha.co.jp/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "sandbox": {
+    "pages": ["sandbox.html"]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sounds/*.mp3", "sandbox.html", "lib/*", "model/*", "icon.png"],
+      "matches": ["*://weebcentral.com/*", "*://mangaplus.shueisha.co.jp/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

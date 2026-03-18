@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --glow-white: #ffffff;
+            --glow-shadow: rgba(255, 255, 255, 0.4);
+            --dark-bg: #101014;
+            --text-main: #ffffff;
+            --text-gray: #bdc3c7;
+            --pause-red: #ff4757;
+            --play-green: #2ecc71; 
+            --warning-red: #ff7675;
+        }
+
+        /* רקע דיפולטי — גלים כהים שזורמים */
+        @keyframes defaultWave {
+            0%   { background-position: 0% 50%; }
+            25%  { background-position: 50% 100%; }
+            50%  { background-position: 100% 50%; }
+            75%  { background-position: 50% 0%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body { 
+            width: 260px; padding: 20px; text-align: center; 
+            background: linear-gradient(135deg, #101014, #1a1a2e, #0d0d1a, #111118, #0a0a14);
+            background-size: 400% 400%;
+            animation: defaultWave 12s ease infinite;
+            color: var(--text-main); 
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            border: 1px solid #333; margin: 0; position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes bgMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* FIX: absolute במקום fixed, כדי לא לגרום להרחבת הפופאפ */
+        #bg-layer-a, #bg-layer-b {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        #bg-layer-b { opacity: 0; }
+
+        body > *:not(#bg-layer-a):not(#bg-layer-b):not(.help-icon):not(#helpTooltip) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bg-calm    { background: linear-gradient(-45deg, #101014, #1a2a6c, #0f2027); background-size: 400% 400% !important; animation: bgMove 15s ease infinite; }
+        .bg-sad     { background: linear-gradient(-45deg, #101014, #2c3e50, #000000); background-size: 400% 400% !important; animation: bgMove 18s ease infinite; }
+        .bg-tension { background: linear-gradient(-45deg, #101014, #4b1212, #1a1a1a); background-size: 400% 400% !important; animation: bgMove 9s  ease infinite; }
+        .bg-action  { background: linear-gradient(-45deg, #101014, #e67e22, #d35400); background-size: 400% 400% !important; animation: bgMove 7s  ease infinite; }
+        .bg-epic    { background: linear-gradient(-45deg, #101014, #8e44ad, #2c3e50); background-size: 400% 400% !important; animation: bgMove 8s  ease infinite; }
+        .bg-drums   { background: linear-gradient(-45deg, #101014, #27ae60, #101014); background-size: 400% 400% !important; animation: bgMove 5s  ease infinite; }
+
+        /* FIX: position: absolute כדי שלא ידחוף תוכן */
+        .help-icon {
+            position: absolute; top: 15px; right: 15px;
+            color: var(--text-gray); font-size: 14px; cursor: pointer;
+            transition: 0.3s ease; width: 22px; height: 22px;
+            border: 1px solid #444; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+        }
+        .help-icon:hover { color: var(--glow-white); border-color: var(--glow-white); box-shadow: 0 0 12px var(--glow-shadow); transform: scale(1.1); }
+        
+        #helpTooltip {
+            position: absolute; top: 45px; right: 15px;
+            background: rgba(20, 20, 25, 0.98); color: #fff; padding: 12px; 
+            border-radius: 6px; font-size: 11px; border: 1px solid var(--glow-white);
+            width: 180px; z-index: 100; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            line-height: 1.4;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s ease;
+            pointer-events: none;
+        }
+        .help-icon:hover + #helpTooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(5px);
+        }
+
+        .ai-warning {
+            display: block;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: var(--warning-red);
+            font-weight: bold;
+        }
+
+        .header-container { 
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            gap: 10px; 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            padding-bottom: 15px; 
+            text-align: center;
+        }
+        
+        .logo-img { width: 45px; height: 45px; border-radius: 10px; border: 1px solid #fff; }
+        h2 { font-size: 19px; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .page-info { font-size: 11px; color: var(--text-gray); margin-top: 3px; }
+
+        @keyframes wave { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .main-btn { padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.3s; margin-bottom: 12px; border: none; }
+
+        #autoBtn { background: linear-gradient(-45deg, #1a2a6c, #1a73e8, #8ab4f8, #ffffff); background-size: 400% 400%; animation: wave 8s ease infinite; color: white; }
+        #autoBtn.active { background: linear-gradient(-45deg, #c02e2e, #ff416c, #ff4b2b, #ffffff); background-size: 400% 400%; animation: wave 4s ease infinite; box-shadow: 0 0 20px rgba(192, 46, 46, 0.5); }
+
+        .secondary-btn { background: rgba(255, 255, 255, 0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .secondary-btn:hover:not(:disabled) { box-shadow: 0 0 15px var(--glow-shadow); border-color: #fff; }
+
+        #manualSection { max-height: 0; overflow: hidden; opacity: 0; transition: 0.4s ease; }
+        #manualSection.open { max-height: 300px; opacity: 1; margin-top: 10px; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .mood-btn { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); 
+            color: #bdc3c7; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 10px; transition: 0.2s;
+            overflow: hidden; position: relative;
+        }
+        .mood-btn:hover:not(:disabled) { 
+            border-color: #fff; color: #fff; 
+            box-shadow: 0 0 15px var(--glow-shadow); 
+            background: rgba(255,255,255,0.1); 
+        }
+
+        @keyframes nextSongIn  { 0% { opacity:0; transform:translateY(100%); } 100% { opacity:1; transform:translateY(0%); } }
+        @keyframes nextSongOut { 0% { opacity:1; transform:translateY(0%);   } 100% { opacity:0; transform:translateY(-100%); } }
+        @keyframes labelReturn { 0% { opacity:0; transform:translateY(100%); } 100% { opacity:1; transform:translateY(0%); } }
+
+        .mood-btn .btn-label { display: block; }
+        .mood-btn .btn-next {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 9px; font-weight: bold; color: #fff; letter-spacing: 1px;
+            opacity: 0; pointer-events: none;
+        }
+        .mood-btn.next-flash .btn-label  { animation: nextSongOut 0.25s ease forwards; }
+        .mood-btn.next-flash .btn-next   { animation: nextSongIn  0.25s ease 0.15s forwards; }
+        .mood-btn.label-return .btn-label { animation: labelReturn 0.3s ease forwards; }
+
+        button:disabled {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+            box-shadow: none !important;
+            animation-play-state: paused !important;
+        }
+
+        @keyframes glowRed { 0% { box-shadow: 0 0 5px #ff4757; } 50% { box-shadow: 0 0 20px #ff4757; } 100% { box-shadow: 0 0 5px #ff4757; } }
+        @keyframes glowGreen { 0% { box-shadow: 0 0 5px #2ecc71; } 50% { box-shadow: 0 0 20px #2ecc71; } 100% { box-shadow: 0 0 5px #2ecc71; } }
+
+        #pauseBtn {
+            background: none; color: var(--pause-red); border: 2px solid currentColor; 
+            margin: 15px auto 0; width: 55px; height: 55px; cursor: pointer; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+            animation: glowRed 2s infinite ease-in-out;
+            padding: 0;
+        }
+        #pauseBtn.paused { color: var(--play-green); animation: glowGreen 2s infinite ease-in-out; }
+        #pauseBtn:hover { transform: scale(1.1); }
+
+        #btnIcon {
+            width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .icon-pause { display: flex; gap: 4px; justify-content: center; width: 100%; }
+        .icon-pause div { width: 6px; height: 18px; background: currentColor; border-radius: 2px; }
+        
+        .icon-play { 
+            width: 0; height: 0; 
+            border-top: 10px solid transparent; 
+            border-bottom: 10px solid transparent; 
+            border-left: 16px solid currentColor; 
+            margin-left: 4px; 
+        }
+    </style>
+</head>
+<body id="mainBody">
+    <div id="bg-layer-a"></div>
+    <div id="bg-layer-b"></div>
+
+    <div class="help-icon" id="helpBtn">?</div>
+    <div id="helpTooltip">
+        <strong>AI MODE:</strong><br>
+        Automatically analyzes manga panels to play the perfect soundtrack.
+        <span class="ai-warning">⚠️ Note: AI can make mistakes in mood detection.</span>
+    </div>
+
+    <div class="header-container">
+        <img src="icon.png" alt="Manga Music Icon" class="logo-img">
+        <div class="title-group">
+            <h2>Manga Music</h2>
+            <div class="page-info" id="pageDisplay">CURRENT PAGE: --</div>
+        </div>
+    </div>
+
+    <button id="autoBtn" class="main-btn">Activate AI Mode</button>
+    <button id="toggleManualBtn" class="main-btn secondary-btn">Manual Mode</button>
+
+    <div id="manualSection">
+        <div class="grid">
+            <button class="mood-btn" data-mood="calm"><span class="btn-label">CALM</span><span class="btn-next">▶ NEXT</span></button>
+            <button class="mood-btn" data-mood="sad"><span class="btn-label">SAD</span><span class="btn-next">▶ NEXT</span></button>
+            <button class="mood-btn" data-mood="tension"><span class="btn-label">TENSION</span><span class="btn-next">▶ NEXT</span></button>
+            <button class="mood-btn" data-mood="action"><span class="btn-label">ACTION</span><span class="btn-next">▶ NEXT</span></button>
+            <button class="mood-btn" data-mood="epic"><span class="btn-label">EPIC</span><span class="btn-next">▶ NEXT</span></button>
+            <button class="mood-btn" data-mood="drums"><span class="btn-label">DRUMS</span><span class="btn-next">▶ NEXT</span></button>
+        </div>
+    </div>
+
+    <button id="pauseBtn">
+        <div id="btnIcon">
+            <div class="icon-pause"><div></div><div></div></div>
+        </div>
+    </button>
+
+    <script src="popup.js"></script>
+</body>
+</html>
